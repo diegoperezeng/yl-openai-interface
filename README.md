@@ -1,7 +1,7 @@
 # yl-openai-interface
 # GPT Chat App
 
-This is a simple chat application that uses OpenAI's GPT-3 model to generate responses to user input. The application is built using Python's Tkinter library for the graphical user interface, and OpenAI's API for the chat functionality.
+This is a simple chat application that uses OpenAI's GPTs models to generate responses to user input. The application is built using Python's Tkinter library for the graphical user interface, and OpenAI's API for the chat functionality.
 
 ## Installation
 
