@@ -1,5 +1,6 @@
 [
     "gpt-4",
+    "gpt-4-1106-preview",
     "text-search-babbage-doc-001",
     "curie-search-query",
     "text-search-babbage-query-001",
