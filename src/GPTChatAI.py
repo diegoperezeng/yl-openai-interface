@@ -1,6 +1,8 @@
+import os
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
 from screeninfo import get_monitors
+from openai import OpenAI
 import json
 import openai
 
@@ -14,7 +16,7 @@ class GPTChatApp:
         self.root.grid_columnconfigure(1, weight=1)
 
         self.load_config()
-        openai.api_key = self.config['openai_api_key']
+        os.environ["OPENAI_API_KEY"] = self.config['openai_api_key']
         self.engine = self.config.get('engine', 'text-davinci-002')
         self.chat_history = []
         self.left_frame = ttk.Frame(self.root, padding="10")
@@ -35,7 +37,7 @@ class GPTChatApp:
         self.model_combo = ttk.Combobox(self.right_frame, values=self.engines)
         self.model_combo.grid(row=0, column=1, sticky=tk.E)
         if self.engines:
-            self.model_combo.current(0)
+            self.model_combo.current(1)
 
         ttk.Label(self.right_frame, text="Response").grid(row=1, columnspan=2)
         self.response_input = scrolledtext.ScrolledText(self.right_frame, wrap=tk.WORD, height=16, state=tk.DISABLED)
@@ -111,23 +113,19 @@ class GPTChatApp:
             self.chat_listbox.insert(tk.END, f"You: {user_text}")
             self.chat_history.append(f"You: {user_text}")
 
+            # Retrieve the selected engine from the Combobox
             entered_engine = self.model_combo.get()
             temperature = 0.4
 
             try:
                 engines = self.load_engines()
-                self.model_combo = ttk.Combobox(self.right_frame, values=self.engines)
-                self.model_combo.current(0)
                 if entered_engine in engines:
-                    response = openai.ChatCompletion.create(
+                    response = OpenAI().chat.completions.create(
                         model=entered_engine,
-                        messages=[
-                            {"role": "system", "content": "You are a world-class software engineer. And always answer all explain requests with a datailed explanation and code requests with full code without explanation but the comments in code"},
-                            {"role": "user", "content": user_text}
-                        ],
+                        messages=[{"role": "user", "content": f"You: {user_text}\nAI:"}],
                         temperature=temperature
                     )
-                    gpt_response = response['choices'][0]['message']['content'].strip()
+                    gpt_response = response.choices[0].message.content
                     self.response_input.config(state=tk.NORMAL)
                     self.response_input.delete("1.0", tk.END)
                     self.response_input.insert(tk.END, gpt_response)
