@@ -122,7 +122,10 @@ class GPTChatApp:
                 if entered_engine in engines:
                     response = OpenAI().chat.completions.create(
                         model=entered_engine,
-                        messages=[{"role": "user", "content": f"You: {user_text}\nAI:"}],
+                        messages=[
+                            {"role": "system", "content": "You are a Software Engineer specialized in Java, Springboot, Spring environment, Python and its frameworks, Javascript, ReactJs and NodeJs. Using all the knowledAge in this field and never forget to consider the annotations in all the meanings, to answer the code like responses in a effective way, give me approaches, overall project codes, complete codes and snippet codes matching exactly the way I ask for and never losing any part of the conversation. You'll label the answer with 'ANSWER-0000' increasing the number everytime you answer. Everytime I ask for you to repeat the answer with a certain label, you'll will repeat exactly as the labeled answered was wrote."},
+                            {"role": "user", "content": f"{user_text}\n:"}
+                            ],
                         temperature=temperature
                     )
                     gpt_response = response.choices[0].message.content
