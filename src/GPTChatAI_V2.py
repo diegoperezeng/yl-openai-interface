@@ -5,6 +5,7 @@ from screeninfo import get_monitors
 from openai import OpenAI
 import json
 import openai
+import tiktoken
 
 class GPTChatApp:
 
@@ -59,6 +60,23 @@ class GPTChatApp:
         y = active_screen.y
         self.root.geometry(f'+{x}+{y}')
         self.load_chat_history()
+    
+    def count_tokens(self, text):
+        enc = tiktoken.encoding_for_model("gpt-4")
+        return len(enc.encode(text))
+    
+    def limit_history_by_tokens(self, history, max_tokens):
+        total_tokens = 0
+        limited_history = []
+
+        for item in reversed(history):
+            item_tokens = self.count_tokens(item)
+            if total_tokens + item_tokens > max_tokens:
+                break
+            limited_history.insert(0, item)
+            total_tokens += item_tokens
+
+        return limited_history
 
     def show_selected_history(self, event):
         selected_index = self.chat_listbox.curselection()
@@ -96,7 +114,7 @@ class GPTChatApp:
             return engines
 
     def get_engines(self):
-        response = openai.Engine.list()
+        response = openai.models.list()
         return [engine['id'] for engine in response['data']]
 
     def submit(self):
@@ -113,6 +131,18 @@ class GPTChatApp:
             self.chat_listbox.insert(tk.END, f"You: {user_text}")
             self.chat_history.append(f"You: {user_text}")
 
+            # Limitar o histórico com base no número de tokens
+            MAX_TOKENS = 90000  # Ajuste este valor conforme necessário
+            limited_history = self.limit_history_by_tokens(self.chat_history, MAX_TOKENS)
+
+            messages = [{"role": "system", "content": "You are a Software Engineer specialized in Java, Springboot, Spring environment, Python and its frameworks, Javascript, ReactJs and NodeJs. Using all the knowledAge in this field and never forget to consider the annotations and the imports if there's present in all the meanings, to answer the code like responses in a effective way, give me approaches, overall project codes, complete codes and snippet codes matching exactly the way I ask for and never losing any part of the conversation. Your code analisys will always consider to link the referenced methods in other classes to reach the solution and all the sequences from the first method to the last one that leads the results. You'll never give generic answers and always consider the project itself. If there's something that is missing to make the analisys perfectly complete, you will ask for it specifically. You always give specific answers about the projet itself"}]
+            
+            for item in limited_history:
+                split_parts = item.split(": ", 1)
+                role = "user" if split_parts[0] == "You" else "assistant"
+                content = split_parts[1]                
+                messages.append({"role": role, "content": content})
+
             # Retrieve the selected engine from the Combobox
             entered_engine = self.model_combo.get()
             temperature = 0.4
@@ -122,10 +152,7 @@ class GPTChatApp:
                 if entered_engine in engines:
                     response = OpenAI().chat.completions.create(
                         model=entered_engine,
-                        messages=[
-                            {"role": "system", "content": "You are a Software Engineer specialized in Java, Springboot, Spring environment, Python and its frameworks, Javascript, ReactJs and NodeJs. Using all the knowledAge in this field and never forget to consider the annotations and the imports if there's present in all the meanings, to answer the code like responses in a effective way, give me approaches, overall project codes, complete codes and snippet codes matching exactly the way I ask for and never losing any part of the conversation. Your code analisys will always consider to link the referenced methods in other classes to reach the solution and all the sequences from the first method to the last one that leads the results. You'll never give generic answers and always consider the project itself. If there's something that is missing to make the analisys perfectly complete, you will ask for it specifically."},
-                            {"role": "user", "content": f"{user_text}\n:"}
-                            ],
+                        messages=messages,
                         temperature=temperature
                     )
                     gpt_response = response.choices[0].message.content
