@@ -5,7 +5,7 @@ from screeninfo import get_monitors
 from openai import OpenAI
 import json
 import openai
-import tiktoken
+# import tiktoken
 
 class GPTChatApp:
 
@@ -62,8 +62,7 @@ class GPTChatApp:
         self.load_chat_history()
     
     def count_tokens(self, text):
-        enc = tiktoken.encoding_for_model("gpt-4")
-        return len(enc.encode(text))
+        return len(text)
     
     def limit_history_by_tokens(self, history, max_tokens):
         total_tokens = 0
