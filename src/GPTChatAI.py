@@ -69,16 +69,31 @@ class GPTChatApp:
             self.response_input.config(state=tk.DISABLED)
 
     def load_config(self):
-        with open("config.json", "r") as f:
+        file_name = "config.json"
+        # Obtém o diretório do script atual
+        script_dir = os.path.dirname(__file__)
+        # Constrói o caminho completo para o arquivo
+        file_path = os.path.join(script_dir, file_name)
+        with open(file_path, "r") as f:
             self.config = json.load(f)
 
     def save_chat_history(self):
-        with open("chat_history.json", "w") as f:
+        file_name = "chat_history.json"
+        # Obtém o diretório do script atual
+        script_dir = os.path.dirname(__file__)
+        # Constrói o caminho completo para o arquivo
+        file_path = os.path.join(script_dir, file_name)
+        with open(file_path, "w") as f:
             json.dump(self.chat_history, f)
 
     def load_chat_history(self):
         try:
-            with open("chat_history.json", "r") as f:
+            file_name = "chat_history.json"
+            # Obtém o diretório do script atual
+            script_dir = os.path.dirname(__file__)
+            # Constrói o caminho completo para o arquivo
+            file_path = os.path.join(script_dir, file_name)
+            with open(file_path, "r") as f:
                 self.chat_history = json.load(f)
             for item in self.chat_history:
                 self.chat_listbox.insert(tk.END, item)
@@ -87,11 +102,21 @@ class GPTChatApp:
 
     def load_engines(self):
         try:
-            with open("engines.json", "r") as f:
+            file_name = "engines.json"
+            # Obtém o diretório do script atual
+            script_dir = os.path.dirname(__file__)
+            # Constrói o caminho completo para o arquivo
+            file_path = os.path.join(script_dir, file_name)
+            with open(file_path, "r") as f:
                 return json.load(f)
         except FileNotFoundError:
             engines = self.get_engines()
-            with open("engines.json", "w") as f:
+            file_name = "engines.json"
+            # Obtém o diretório do script atual
+            script_dir = os.path.dirname(__file__)
+            # Constrói o caminho completo para o arquivo
+            file_path = os.path.join(script_dir, file_name)
+            with open(file_path, "w") as f:
                 json.dump(engines, f)
             return engines
 
