@@ -17,7 +17,7 @@ class GPTChatApp:
 
         self.load_config()
         os.environ["OPENAI_API_KEY"] = self.config['openai_api_key']
-        self.engine = self.config.get('engine', 'gpt-4o')
+        self.engine = self.config.get('engine', 'chatgpt-4o-latest')
         self.chat_history = []
         self.left_frame = ttk.Frame(self.root, padding="10")
         self.left_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
